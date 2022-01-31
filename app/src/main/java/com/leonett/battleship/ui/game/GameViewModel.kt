@@ -22,7 +22,15 @@ class GameViewModel : ViewModel() {
 
     fun fire(x: Int, y: Int) {
         if (game.fire(x, y)) {
-            _state.value = GameScreenState.Default(game)
+            if (game.checkWin()) {
+                viewModelScope.launch {
+                    delay(500)
+
+                    _state.value = GameScreenState.Victory(game)
+                }
+            } else {
+                _state.value = GameScreenState.Default(game)
+            }
         } else {
             _state.value = GameScreenState.Default(game)
 

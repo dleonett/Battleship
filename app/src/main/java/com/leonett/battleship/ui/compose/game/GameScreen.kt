@@ -73,6 +73,15 @@ fun GameScreen(
                 }
             }
         }
+        is GameScreenState.Victory -> {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)
+            ) {
+                Text(text = "Game over")
+            }
+        }
     }
 }
 
@@ -92,6 +101,7 @@ fun OpponentBoard(game: Game, onTileClick: ((x: Int, y: Int) -> Unit)? = null) {
                         modifier = Modifier
                             .weight(1f)
                             .aspectRatio(1f)
+                            .background(if (ship.value.discovered) Color.Gray else Color.Transparent)
                             .border(1.dp, Color.Black),
                         enabled = !isDiscovered.value,
                         onClick = {

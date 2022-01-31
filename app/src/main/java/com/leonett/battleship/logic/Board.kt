@@ -13,7 +13,27 @@ data class Board(var size: Int = 10, var ships: List<Ship>, var player: Player) 
 
         tiles[pointX][pointY].discovered = true
 
-        return tiles[pointX][pointY].ship !is Ship.None
+        val ship = tiles[pointX][pointY].ship
+        if (ship !is Ship.None) {
+            checkShipDiscovered(ship)
+            return true
+        }
+
+        return false
+    }
+
+    private fun checkShipDiscovered(ship: Ship) {
+        var count = 0
+
+        ship.tiles.forEach {
+            if (tiles[it.first][it.second].discovered) {
+                count++
+            }
+        }
+
+        if (ship.tiles.size == count) {
+            ship.discovered = true
+        }
     }
 
     fun shuffle() {
@@ -47,7 +67,7 @@ data class Board(var size: Int = 10, var ships: List<Ship>, var player: Player) 
             return emptyList()
         }
 
-        val resultList = arrayListOf<Pair<Int, Int>>()
+        val shipTiles = arrayListOf<Pair<Int, Int>>()
         var remainingTiles = shipSize
         var pointX = startPointX
         var pointY = startPointY
@@ -64,12 +84,24 @@ data class Board(var size: Int = 10, var ships: List<Ship>, var player: Player) 
                 return emptyList()
             }
 
-            resultList.add(Pair(pointX, pointY))
+            shipTiles.add(Pair(pointX, pointY))
 
             remainingTiles--
         }
 
-        return resultList
+        return shipTiles
+    }
+
+    fun checkWin(): Boolean {
+        var count = 0
+
+        ships.forEach {
+            if (it.discovered) {
+                count++
+            }
+        }
+
+        return ships.size == count
     }
 
     private fun placeShip(ship: Ship, tiles: List<Pair<Int, Int>>) {

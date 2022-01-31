@@ -6,4 +6,5 @@ sealed class GameScreenState {
     object Idle : GameScreenState()
     data class Default(val game: Game) : GameScreenState()
     data class Middle(val game: Game) : GameScreenState()
+    data class Victory(val game: Game) : GameScreenState()
 }

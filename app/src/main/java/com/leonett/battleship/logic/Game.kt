@@ -48,6 +48,10 @@ class Game {
         return opponentBoard.fire(x, y)
     }
 
+    fun checkWin(): Boolean {
+        return opponentBoard.checkWin()
+    }
+
     fun switch() {
         if (activePlayer.name == playerOne.name) {
             activePlayer = playerTwo
