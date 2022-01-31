@@ -1,23 +1,83 @@
 package com.leonett.battleship.logic
 
-data class Board(var size: Int = 10) {
+import kotlin.random.Random
+
+data class Board(var size: Int = 10, var ships: List<Ship>, var player: Player) {
 
     var tiles: Array<Array<Tile>> = Array(size) { Array(size) { Tile() } }
 
-    fun fire(x: Int, y: Int) {
-        if (x !in 0..size || y !in 0..size) return
+    fun fire(pointX: Int, pointY: Int): Boolean {
+        if (pointX !in 0 until size || pointY !in 0 until size) {
+            return false
+        }
 
-        tiles[x][y].fire()
+        tiles[pointX][pointY].discovered = true
+
+        return tiles[pointX][pointY].ship !is Ship.None
     }
 
     fun shuffle() {
         clear()
 
-        tiles[(0..9).random()][(0..9).random()].ship = Ship.Ship1
-        tiles[(0..9).random()][(0..9).random()].ship = Ship.Ship2
-        tiles[(0..9).random()][(0..9).random()].ship = Ship.Ship3
-        tiles[(0..9).random()][(0..9).random()].ship = Ship.Ship4
-        tiles[(0..9).random()][(0..9).random()].ship = Ship.Ship5
+        ships.forEach { attemptToPlaceShip(it) }
+    }
+
+    private fun attemptToPlaceShip(ship: Ship) {
+        if (ship !is Ship.None) {
+            do {
+                val isVertical = Random.nextBoolean()
+                val pointX = (0 until size).random()
+                val pointY = (0 until size).random()
+
+                val tiles = generateShipTiles(ship.size, isVertical, pointX, pointY)
+                if (tiles.isNotEmpty()) {
+                    placeShip(ship, tiles)
+                }
+            } while (tiles.isEmpty())
+        }
+    }
+
+    private fun generateShipTiles(
+        shipSize: Int,
+        isVertical: Boolean,
+        startPointX: Int,
+        startPointY: Int
+    ): List<Pair<Int, Int>> {
+        if (tiles[startPointX][startPointY].ship !is Ship.None) {
+            return emptyList()
+        }
+
+        val resultList = arrayListOf<Pair<Int, Int>>()
+        var remainingTiles = shipSize
+        var pointX = startPointX
+        var pointY = startPointY
+
+        while (remainingTiles > 0) {
+            pointX = if (isVertical) pointX else ++pointX
+            pointY = if (isVertical) ++pointY else pointY
+
+            if (pointX !in 0 until size || pointY !in 0 until size) {
+                return emptyList()
+            }
+
+            if (tiles[pointX][pointY].ship !is Ship.None) {
+                return emptyList()
+            }
+
+            resultList.add(Pair(pointX, pointY))
+
+            remainingTiles--
+        }
+
+        return resultList
+    }
+
+    private fun placeShip(ship: Ship, tiles: List<Pair<Int, Int>>) {
+        tiles.forEach {
+            this.tiles[it.first][it.second].ship = ship
+        }
+
+        ship.tiles = tiles
     }
 
     fun clear() {
@@ -28,11 +88,4 @@ data class Board(var size: Int = 10) {
         }
     }
 
-}
-
-fun Board.duplicate(): Board {
-    val board = Board()
-    board.size = this.size
-    board.tiles = this.tiles
-    return board
 }
