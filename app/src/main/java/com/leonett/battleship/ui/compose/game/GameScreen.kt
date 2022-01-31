@@ -8,7 +8,7 @@ import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.filled.Circle
 import androidx.compose.material.icons.outlined.Circle
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -62,7 +62,14 @@ fun GameScreen(
                     Box(modifier = Modifier.weight(1f)) {
                         PlayerBoard(game)
                     }
-                    Box(modifier = Modifier.weight(1f))
+                    Spacer(modifier = Modifier.width(16.dp))
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .aspectRatio(1f)
+                    ) {
+                        PlayerShips(game)
+                    }
                 }
             }
         }
@@ -85,7 +92,7 @@ fun OpponentBoard(game: Game, onTileClick: ((x: Int, y: Int) -> Unit)? = null) {
                         modifier = Modifier
                             .weight(1f)
                             .aspectRatio(1f)
-                            .border(1.dp, Color.Gray),
+                            .border(1.dp, Color.Black),
                         enabled = !isDiscovered.value,
                         onClick = {
                             onTileClick?.invoke(x, y)
@@ -128,7 +135,7 @@ fun PlayerBoard(game: Game) {
                             .weight(1f)
                             .aspectRatio(1f)
                             .background(if (ship.value !is Ship.None) Color.Gray else Color.Transparent)
-                            .border(1.dp, Color.Gray),
+                            .border(1.dp, Color.Black),
                         enabled = false,
                         onClick = { }
                     ) {
@@ -146,6 +153,32 @@ fun PlayerBoard(game: Game) {
                         }
                     }
                 }
+            }
+        }
+    }
+}
+
+@Composable
+fun PlayerShips(game: Game) {
+    Column(modifier = Modifier.fillMaxSize()) {
+        game.playerBoard.ships.forEachIndexed { index, item ->
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f)
+            ) {
+                item.tiles.forEach {
+                    Spacer(
+                        modifier = Modifier
+                            .fillMaxHeight()
+                            .aspectRatio(1f)
+                            .background(if (game.playerBoard.tiles[it.first][it.second].discovered) Color.Red else Color.Gray)
+                            .border(1.dp, Color.Black)
+                    )
+                }
+            }
+            if (index < game.playerBoard.ships.size - 1) {
+                Spacer(modifier = Modifier.height(12.dp))
             }
         }
     }
