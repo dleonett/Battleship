@@ -80,6 +80,8 @@ fun GameScreen(
                     .padding(16.dp)
             ) {
                 Text(text = "Game over")
+                Spacer(modifier = Modifier.height(16.dp))
+                Text(text = "Winner: ${screenState.game.activePlayer.name}")
             }
         }
     }
