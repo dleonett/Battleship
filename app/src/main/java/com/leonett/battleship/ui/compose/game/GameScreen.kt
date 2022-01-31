@@ -1,5 +1,6 @@
 package com.leonett.battleship.ui.compose.game
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Button
@@ -7,7 +8,7 @@ import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Circle
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.Circle
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -44,62 +45,104 @@ fun GameScreen(
             }
         }
         is GameScreenState.Default -> {
+            val game = screenState.game
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(16.dp)
             ) {
-                Text(text = "Active player: ${screenState.game.activePlayer.name}")
+                Text(text = "Active player: ${game.activePlayer.name}")
                 Spacer(modifier = Modifier.height(16.dp))
-                Column(
-                    modifier = Modifier.fillMaxWidth()
+                OpponentBoard(game, onTileClick)
+                Spacer(modifier = Modifier.height(16.dp))
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
                 ) {
-                    for (y in (0 until screenState.game.activeBoard.size)) {
-                        Row(modifier = Modifier.fillMaxWidth()) {
-                            for (x in (0 until screenState.game.activeBoard.size)) {
-                                val tile = screenState.game.activeBoard.tiles[x][y]
-                                val isDiscovered = mutableStateOf(tile.discovered)
-                                val ship = mutableStateOf(tile.ship)
+                    Box(modifier = Modifier.weight(1f)) {
+                        PlayerBoard(game)
+                    }
+                    Box(modifier = Modifier.weight(1f))
+                }
+            }
+        }
+    }
+}
 
-                                IconButton(
-                                    modifier = Modifier
-                                        .weight(1f)
-                                        .aspectRatio(1f)
-                                        .border(1.dp, Color.Gray),
-                                    enabled = !isDiscovered.value,
-                                    onClick = {
-                                        onTileClick?.invoke(x, y)
-                                        isDiscovered.value = true
-                                    }
-                                ) {
-                                    if (isDiscovered.value) {
-                                        val icon = if (ship.value is Ship.None)
-                                            Icons.Outlined.Circle
-                                        else
-                                            Icons.Filled.Circle
+@Composable
+fun OpponentBoard(game: Game, onTileClick: ((x: Int, y: Int) -> Unit)? = null) {
+    Column(
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        for (y in (0 until game.opponentBoard.size)) {
+            Row(modifier = Modifier.fillMaxWidth()) {
+                for (x in (0 until game.opponentBoard.size)) {
+                    val tile = game.opponentBoard.tiles[x][y]
+                    val isDiscovered = mutableStateOf(tile.discovered)
+                    val ship = mutableStateOf(tile.ship)
 
-                                        Icon(
-                                            imageVector = icon,
-                                            tint = Color.Red,
-                                            contentDescription = null
-                                        )
-                                    }
-                                    /*val icon = when (ship.value) {
-                                        Ship.None -> Icons.Outlined.Circle
-                                        Ship.ShipA -> Icons.Filled.AcUnit
-                                        Ship.ShipB -> Icons.Filled.BabyChangingStation
-                                        Ship.ShipC -> Icons.Filled.Cable
-                                        Ship.ShipD -> Icons.Filled.Dangerous
-                                        Ship.ShipE -> Icons.Filled.Eco
-                                    }
-
-                                    Icon(
-                                        imageVector = icon,
-                                        tint = Color.Red,
-                                        contentDescription = null
-                                    )*/
-                                }
+                    IconButton(
+                        modifier = Modifier
+                            .weight(1f)
+                            .aspectRatio(1f)
+                            .border(1.dp, Color.Gray),
+                        enabled = !isDiscovered.value,
+                        onClick = {
+                            onTileClick?.invoke(x, y)
+                            isDiscovered.value = true
+                        }
+                    ) {
+                        if (isDiscovered.value) {
+                            val icon = when (ship.value) {
+                                is Ship.None -> Icons.Outlined.Circle
+                                else -> Icons.Filled.Circle
                             }
+
+                            Icon(
+                                imageVector = icon,
+                                tint = Color.Red,
+                                contentDescription = null
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun PlayerBoard(game: Game) {
+    Column(
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        for (y in (0 until game.playerBoard.size)) {
+            Row(modifier = Modifier.fillMaxWidth()) {
+                for (x in (0 until game.playerBoard.size)) {
+                    val tile = game.playerBoard.tiles[x][y]
+                    val isDiscovered = mutableStateOf(tile.discovered)
+                    val ship = mutableStateOf(tile.ship)
+
+                    IconButton(
+                        modifier = Modifier
+                            .weight(1f)
+                            .aspectRatio(1f)
+                            .background(if (ship.value !is Ship.None) Color.Gray else Color.Transparent)
+                            .border(1.dp, Color.Gray),
+                        enabled = false,
+                        onClick = { }
+                    ) {
+                        if (isDiscovered.value) {
+                            val icon = when (ship.value) {
+                                is Ship.None -> Icons.Outlined.Circle
+                                else -> Icons.Filled.Circle
+                            }
+
+                            Icon(
+                                imageVector = icon,
+                                tint = Color.Red,
+                                contentDescription = null
+                            )
                         }
                     }
                 }

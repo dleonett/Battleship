@@ -4,7 +4,8 @@ class Game {
 
     var boardPlayerOne: Board
     var boardPlayerTwo: Board
-    var activeBoard: Board
+    var playerBoard: Board
+    var opponentBoard: Board
     var playerOne: Player
     var playerTwo: Player
     var activePlayer: Player
@@ -32,31 +33,35 @@ class Game {
         )
         boardPlayerOne = Board(BOARD_SIZE, shipsPlayerOne, playerOne)
         boardPlayerTwo = Board(BOARD_SIZE, shipsPlayerTwo, playerTwo)
-        activeBoard = boardPlayerTwo
+        playerBoard = boardPlayerOne
+        opponentBoard = boardPlayerTwo
 
+        initBoards()
+    }
+
+    private fun initBoards() {
         boardPlayerOne.shuffle()
         boardPlayerTwo.shuffle()
     }
 
     fun fire(x: Int, y: Int): Boolean {
-        return activeBoard.fire(x, y)
+        return opponentBoard.fire(x, y)
     }
 
     fun switch() {
-        switchActivePlayer()
-        switchActiveBoard()
-    }
-
-    private fun switchActivePlayer() {
-        activePlayer = if (activePlayer.name == playerOne.name) playerTwo else playerOne
-    }
-
-    private fun switchActiveBoard() {
-        activeBoard = if (activeBoard == boardPlayerOne) boardPlayerTwo else boardPlayerOne
+        if (activePlayer.name == playerOne.name) {
+            activePlayer = playerTwo
+            playerBoard = boardPlayerTwo
+            opponentBoard = boardPlayerOne
+        } else {
+            activePlayer = playerOne
+            playerBoard = boardPlayerOne
+            opponentBoard = boardPlayerTwo
+        }
     }
 
     fun clear() {
-        activeBoard.clear()
+        playerBoard.clear()
     }
 
     companion object {
