@@ -25,7 +25,8 @@ import com.leonett.battleship.ui.game.GameViewModel
 fun GameScreen(
     screenState: GameScreenState,
     onTileClick: ((x: Int, y: Int) -> Unit)? = null,
-    onNextPlayerClick: (() -> Unit)? = null
+    onNextPlayerClick: (() -> Unit)? = null,
+    onGameFinishedClick: (() -> Unit)? = null
 ) {
     when (screenState) {
         is GameScreenState.Idle -> {
@@ -73,7 +74,7 @@ fun GameScreen(
                 }
             }
         }
-        is GameScreenState.Victory -> {
+        is GameScreenState.Finished -> {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -82,6 +83,10 @@ fun GameScreen(
                 Text(text = "Game over")
                 Spacer(modifier = Modifier.height(16.dp))
                 Text(text = "Winner: ${screenState.game.activePlayer.name}")
+                Spacer(modifier = Modifier.height(16.dp))
+                Button(onClick = { onGameFinishedClick?.invoke() }) {
+                    Text(text = "Play again")
+                }
             }
         }
     }
@@ -116,10 +121,14 @@ fun OpponentBoard(game: Game, onTileClick: ((x: Int, y: Int) -> Unit)? = null) {
                                 is Ship.None -> Icons.Outlined.Circle
                                 else -> Icons.Filled.Circle
                             }
+                            val color = when (ship.value) {
+                                is Ship.None -> Color.Black
+                                else -> Color.Red
+                            }
 
                             Icon(
                                 imageVector = icon,
-                                tint = Color.Red,
+                                tint = color,
                                 contentDescription = null
                             )
                         }
@@ -156,10 +165,14 @@ fun PlayerBoard(game: Game) {
                                 is Ship.None -> Icons.Outlined.Circle
                                 else -> Icons.Filled.Circle
                             }
+                            val color = when (ship.value) {
+                                is Ship.None -> Color.Black
+                                else -> Color.Red
+                            }
 
                             Icon(
                                 imageVector = icon,
-                                tint = Color.Red,
+                                tint = color,
                                 contentDescription = null
                             )
                         }
@@ -200,10 +213,11 @@ fun PlayerShips(game: Game) {
 fun GameScreenContainer(
     viewModel: GameViewModel,
     onCellClick: ((x: Int, y: Int) -> Unit)? = null,
-    onNextPlayerClick: (() -> Unit)? = null
+    onNextPlayerClick: (() -> Unit)? = null,
+    onGameFinishedClick: (() -> Unit)? = null
 ) {
     val state by remember(viewModel) { viewModel.state }.collectAsState()
-    GameScreen(state, onCellClick, onNextPlayerClick)
+    GameScreen(state, onCellClick, onNextPlayerClick, onGameFinishedClick)
 }
 
 @Preview

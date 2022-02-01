@@ -26,7 +26,7 @@ class GameViewModel : ViewModel() {
                 viewModelScope.launch {
                     delay(500)
 
-                    _state.value = GameScreenState.Victory(game)
+                    _state.value = GameScreenState.Finished(game)
                 }
             } else {
                 _state.value = GameScreenState.Default(game)
@@ -48,7 +48,7 @@ class GameViewModel : ViewModel() {
     }
 
     fun clearGame() {
-        game.clear()
+        game = Game()
         _state.value = GameScreenState.Default(game)
     }
 
