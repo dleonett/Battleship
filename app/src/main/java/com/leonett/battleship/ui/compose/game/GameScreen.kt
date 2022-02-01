@@ -11,10 +11,13 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Circle
 import androidx.compose.material.icons.outlined.Circle
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.leonett.battleship.logic.Game
 import com.leonett.battleship.logic.Ship
 import com.leonett.battleship.ui.compose.theme.BattleshipTheme
@@ -64,11 +67,7 @@ fun GameScreen(
                         PlayerBoard(game)
                     }
                     Spacer(modifier = Modifier.width(16.dp))
-                    Box(
-                        modifier = Modifier
-                            .weight(1f)
-                            .aspectRatio(1f)
-                    ) {
+                    Box(modifier = Modifier.weight(1f)) {
                         PlayerShips(game)
                     }
                 }
@@ -97,8 +96,30 @@ fun OpponentBoard(game: Game, onTileClick: ((x: Int, y: Int) -> Unit)? = null) {
     Column(
         modifier = Modifier.fillMaxWidth()
     ) {
+        Row(modifier = Modifier.fillMaxWidth()) {
+            for (x in (-1 until game.opponentBoard.size)) {
+                if (x == -1) {
+                    Spacer(modifier = Modifier.width(20.dp))
+                } else {
+                    Text(
+                        text = "${x + 1}",
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.weight(1f)
+                    )
+                }
+            }
+        }
         for (y in (0 until game.opponentBoard.size)) {
-            Row(modifier = Modifier.fillMaxWidth()) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                val letter = 'A'
+                Text(
+                    text = "${letter + y}",
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.width(20.dp)
+                )
                 for (x in (0 until game.opponentBoard.size)) {
                     val tile = game.opponentBoard.tiles[x][y]
                     val isDiscovered = mutableStateOf(tile.discovered)
@@ -144,8 +165,32 @@ fun PlayerBoard(game: Game) {
     Column(
         modifier = Modifier.fillMaxWidth()
     ) {
+        Row(modifier = Modifier.fillMaxWidth()) {
+            for (x in (-1 until game.playerBoard.size)) {
+                if (x == -1) {
+                    Spacer(modifier = Modifier.width(12.dp))
+                } else {
+                    Text(
+                        text = "${x + 1}",
+                        fontSize = 10.sp,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.weight(1f)
+                    )
+                }
+            }
+        }
         for (y in (0 until game.playerBoard.size)) {
-            Row(modifier = Modifier.fillMaxWidth()) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                val letter = 'A'
+                Text(
+                    text = "${letter + y}",
+                    fontSize = 10.sp,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.width(12.dp)
+                )
                 for (x in (0 until game.playerBoard.size)) {
                     val tile = game.playerBoard.tiles[x][y]
                     val isDiscovered = mutableStateOf(tile.discovered)
@@ -185,18 +230,13 @@ fun PlayerBoard(game: Game) {
 
 @Composable
 fun PlayerShips(game: Game) {
-    Column(modifier = Modifier.fillMaxSize()) {
+    Column(modifier = Modifier.fillMaxWidth()) {
         game.playerBoard.ships.forEachIndexed { index, item ->
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f)
-            ) {
+            Row(modifier = Modifier.fillMaxWidth()) {
                 item.tiles.forEach {
                     Spacer(
                         modifier = Modifier
-                            .fillMaxHeight()
-                            .aspectRatio(1f)
+                            .size(24.dp)
                             .background(if (game.playerBoard.tiles[it.first][it.second].discovered) Color.Red else Color.Gray)
                             .border(1.dp, Color.Black)
                     )
